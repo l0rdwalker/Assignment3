@@ -1,0 +1,157 @@
+
+{% include 'top.html' %}
+{% if session['isadmin'] == True %}
+
+<style>
+    .tableWrapper {
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    margin-top: 50px;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+td {
+    text-align: center;
+}
+
+th {
+    background-color: #dddddd;
+    text-align: center;
+}
+
+#inputFeilds {
+    height: fit-content;
+    width: fit-content;
+    margin: auto;
+    margin-top: 50px;
+}
+
+#btnWrapper {
+    height: fit-content;
+    width: fit-content;
+    margin: auto;
+    padding-top: 20px;
+}
+</style>
+
+<script>
+const getCardByDate = '/cards/getAllByDate';
+const getExpiryReport = '/cards/getExpiryReport';
+
+async function api_call(url) {
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            return response.json();
+        } else {
+            console.error('Error:', response.status, response.statusText);
+            return null; 
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return null; 
+    }
+}
+
+async function getCardsByDate() {
+    var date = document.getElementById('CardExpireDateSelecter').value;
+
+    if (date == "") {
+        alert("You must provide a date.")
+    } else {
+        var getCardByDateWithData = getCardByDate + `?date=${date}`;
+
+        var data = await api_call(getCardByDateWithData);
+
+        var table = document.getElementById('mainTable');
+
+        while (table.childNodes.length > 2) {
+            table.childNodes[table.childNodes.length-1].remove();
+        }
+
+        for (var x = 0; x < data.length; x++) {
+            var trElement = document.createElement('tr');
+            
+            for (const [key, value] of Object.entries(data[x])) {
+                var tdElement = document.createElement('td'); 
+                tdElement.innerText = value;
+                trElement.appendChild(tdElement); 
+            }
+
+            table.appendChild(trElement);
+        }        
+    }
+}
+
+async function generate_expiry_report() {
+    var data = await api_call(getExpiryReport);
+
+    var table = document.getElementById('ExpiryReport');
+    
+    while (table.childNodes.length > 2) {
+        table.childNodes[table.childNodes.length-1].remove();
+    }
+
+    for (var x = 0; x < data.length; x++) {
+        var trElement = document.createElement('tr');
+        for (const [key, value] of Object.entries(data[x])) {
+            var tdElement = document.createElement('td');
+            tdElement.innerText = value;
+            trElement.appendChild(tdElement); 
+        }
+        table.appendChild(trElement);
+    }
+}
+
+</script>
+
+<div id="inputFeilds">
+    <label for="datePicker">Select a Date:</label>
+    <input type="date" id="CardExpireDateSelecter" name="selectedDate">
+    <button onclick="getCardsByDate()">Search</button>
+</div>
+
+
+<div class="tableWrapper">
+    <table id="mainTable">
+        <tr>
+            <th>CardID</th>
+            <th>CardTypeID</th>
+            <th>UserID</th>
+            <th>Expiry</th>
+            <th>Balance</th>
+            <th>Delete</th>
+            <th>Edit</th>
+        </tr>
+    </table>
+</div>
+
+
+<div class="tableWrapper">
+    <table id="ExpiryReport">
+        <tr>
+            <th>ExpiryDate</th>
+            <th>Count</th>
+        </tr>
+    </table>
+</div>
+<div id="btnWrapper">
+    <button onclick="generate_expiry_report()">Refresh Expiry Report</button>
+</div>
+
+
+
+
+{% endif %}

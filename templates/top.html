@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- this goes to the 'static' folder and grabs our CSS -->
+        <!-- [Brief Intro:] CSS is how we make the websites look nicer -->
+        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/pure.css') }}">
+        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/main.css') }}">
+        <script src="{{ url_for('static', filename='scripts/jquery.js') }}"></script>
+        <script type="application/javascript">
+
+            function getsearchtarget()
+            {
+
+                //Get the select select list and store in a variable
+                var e = document.getElementById("searchtarget");
+
+                //Get the selected value of the select list
+                var formaction = e.options[e.selectedIndex].value;
+
+                //Update the form action
+                document.searchform.action = formaction;
+
+            }
+        </script>
+        <title>{{ page.title }}</title>
+    </head>
+    <body>
+        <!-- Generating the menu and what happens when the user is logged in VS logged out -->
+        <div id="header" class="pure-menu pure-menu-horizontal pure-menu-scrollable">
+            <a href="/" class="pure-menu-heading pure-menu-link">Travel</a>
+            
+            <ul class="pure-menu-list">        
+                {% if session.logged_in %}
+                  <li class="pure-menu-item"><a href="{{ url_for('list_users') }}" class="pure-menu-link">Users</a></li>
+                  <li class="pure-menu-item"><a href="{{ url_for('list_consolidated_users') }}" class="pure-menu-link">User Details</a></li>
+                  <li class="pure-menu-item"><a href="{{ url_for('list_user_stats') }}" class="pure-menu-link">User Stats</a></li>
+                  <li class="pure-menu-item"><a href="{{ url_for('get_my_cards_page') }}" class="pure-menu-link">My Cards</a></li>
+                  {% if session['isadmin'] == True %}
+                    <li class="pure-menu-item"><a href="{{ url_for('all_cards') }}" class="pure-menu-link">All Cards (ADMIN)</a></li>
+                    <li class="pure-menu-item"><a href="{{ url_for('get_card_expire_page') }}" class="pure-menu-link">Card Expiry Search (ADMIN)</a></li>
+                  {% endif %}
+                {% endif %}
+                <li class="pure-menu-item"><a href="{{ url_for('logout')}}" class="pure-menu-link">Logout</a></li>
+                <li class="pure-menu-item">
+                  <div style="float:right">
+                    <form name="searchform" class="Search" method="POST" action="" onsubmit="getsearchtarget()" >
+                        <input type="text" name="searchterm" placeholder="Search Term" autofocus required>
+                        <br/>
+                        <select id="searchtarget" name="searchtarget">
+                          {% if session.logged_in %}
+                            <option value="{{ url_for('search_users_byname' ) }}" selected>Users</option>
+                          {% endif %}                          
+                          <!-- TODO uncomment the next line by removing the brace+hashtag to add this menu option -->
+                        </select>
+                        <button type="submit" class="pure-button">Search</button>
+                    </form>
+                  </div>
+                </li>
+            </ul>
+            
+            <!-- <div id="top-dbuser">{{ page.dbuser }}</div> -->
+        </div>
+        <!--
+            This is for our flashed messages
+            Whenever we use flash('message in here')
+            it will come out inside this list
+        -->
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}

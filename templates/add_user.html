@@ -1,0 +1,57 @@
+{% include 'top.html' %}
+<div class="content">
+    <div class="container details">
+
+        <h2 class="title"> Add User </h2>
+
+        <!-- -- Users: userid, cardid, firstname, lastname, preferredname, userroleid, password
+            CREATE TABLE Users (
+                userid serial PRIMARY KEY,  
+                firstname text, 
+                lastname text, 
+                userroleid bigint REFERENCES UserRoles(userroleid) NOT NULL, 
+                password text NOT NULL
+            );
+
+            Associated userrole information
+                - needs to be a drop down of valid userroles
+                    - display by rolename
+                    - form input by userroleid
+
+        -->
+        <form class="Add" method="POST" action="{{url_for('add_user')}}">
+
+            <label for="firstname">First name:</label>
+            <input type="text" id="firstname" name="firstname" value="New" placeholder="Enter firstname here">
+            
+            <label for="lastname">Last name:</label>
+            <input type="text" id="lastname" name="lastname" value="User" placeholder="Enter lastname here">
+            <br/>
+            <select id="userroleid" name="userroleid">
+                {% for item in userroles %}
+                    <option value="{{item['userroleid']}}" >{{item['rolename']}} </option>
+                {% endfor %}
+            </select>
+            <br/>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" value="blank" placeholder="Enter password here">
+            <br/>
+            <br/>
+            <button class="pure-button pure-button-primary" type="submit">Add</button>
+            <br/>
+            <hr/>
+            <hr/>
+            <hr/>
+            
+
+        </form>
+        <br/>
+        <div>
+ 
+        <br/>
+        <div>
+
+    </div>
+</div>
+</body>
+</html>

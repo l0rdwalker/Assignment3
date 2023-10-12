@@ -1,0 +1,21 @@
+{% include 'top.html' %}
+    <div id="content">
+        <!--
+            Simple login form, the thing you want to pay attention to is
+            the method and the action, it shows you what's happening
+        -->
+
+        <small class="note">Note: We are making a fake user in our system. The login is from the schema sample data</small>
+        <form class="pure-form pure-form-stacked login" method="POST" action="{{ url_for('login') }}">
+            <h2>Log in</h2>
+			<h4>Note: In the database try:<h4>
+			<code>SELECT * FROM {logintable};
+</code>
+			<h4>To get the userid and password<h4>
+            <input type="text" name="userid" placeholder="Fake User ID" required>
+            <input type="password" name="password" placeholder="Password">
+            <input class="pure-button pure-button-primary" type="submit">
+        </form>
+    </div>
+</body>
+</html>

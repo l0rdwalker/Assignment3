@@ -1,0 +1,72 @@
+
+    {% include 'top.html' %}
+    
+    <div id="content">
+        <h1 class="page-title">users List Contents</h1>
+        {% if session['isadmin'] == True %}
+            <div style="float: left;">
+                <button class="pure-button" style="float: center;"><a href="{{ url_for('add_user') }}" class="pure-menu-link">Add User</a></button>
+            </div>
+        {% endif %}
+        <br/>
+        <table class="pure-table">
+            <thead>
+                <tr>
+                   {% if session['isadmin'] == True %}
+                    <th> Delete </th>
+                    <th> userid </th>
+                    <th> firstname </th>
+                    <th> lastname </th>
+                    <th> userroleid </th>
+                    <th> password </th>
+                    <th> Update </th>
+                   {% else %}
+                    <th> userid </th>
+                    <th> firstname </th>
+                    <th> lastname </th>
+                    <th> userroleid </th>
+                    <th> password </th>
+                   {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in users %}
+                <tr>
+                    {% if session['isadmin'] == True %}
+                    
+                        <td> 
+                            {% if item['isadmin'] == True %}
+                                <button onclick="alert('This would delete user {{item['userid']}} by calling url_for(\'delete_user({{item['userid']}})\')')">Delete</button>
+                            {% else %}
+                                <button class="pure-button" ><a href="{{ url_for('delete_user', userid=item.userid) }}" class="pure-menu-link">Delete</a></button>
+                            {% endif %}
+                        </td>
+                        <form name="{{item['userid']}}_form" class="Update" method="POST" action="{{url_for('update_user')}}">
+                            <input type="hidden" id="userid" name="userid" value="{{item['userid']}}" />
+                            <td><b> {{item['userid']}} </b></td>
+                            <td> <input type="text" id="firstname" name="firstname" value="{{item['firstname']}}" placeholder="{{item['firstname']}}">
+                            </td>
+                            <td> <input type="text" id="lastname" name="lastname" value="{{item['lastname']}}" placeholder="{{item['lastname']}}">
+                            </td>
+                            <td> <input type="number" id="userroleid" name="userroleid" value="{{item['userroleid']}}" placeholder="{{item['userroleid']}}">
+                            </td>
+                            <td> <input type="password" id="password" name="password" value="{{item['password']}}" placeholder="{{item['password']}}">
+                            </td>
+                            <td> <button class="pure-button pure-button-primary" type="submit">Update</button>
+                            </td>
+                        </form>
+                    {% else %}
+                        <td><b> {{item['userid']}} </b></td>
+                        <td> {{item['firstname']}}</td>
+                        <td> {{item['lastname']}}</td>
+                        <td> {{item['userroleid']}}</td>
+                        <td> Admin only</td>
+                    {% endif %} 
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </body>
+    </html>
+    

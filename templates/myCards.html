@@ -1,0 +1,208 @@
+{% include 'top.html' %}
+
+<style>
+.tableWrapper {
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    margin-top: 100px;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+td {
+    text-align: center;
+}
+
+th {
+    background-color: #dddddd;
+    text-align: center;
+}
+#AddNewCardWrapper {
+    margin: auto;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+#AddNewCard {
+    width: fit-content;
+    height: fit-content;
+    margin: 50px;
+    background-color: rgb(235, 235, 235);
+    padding: 50px;
+    display: none;
+}
+
+#ProtectContents {
+    width: fit-content;
+    height: fit-content;
+}
+
+#OpenCardReaderBTN {
+    margin: auto;
+    text-align: center;
+    margin-top: 20px;
+}
+</style>
+
+<script>
+const getMyCardsUrl = '/cards/getMyCards';
+const getAllCardIdTypes = '/cards/getAllCardTypes';
+const addNewCardToDB = '/cards/user/addNew';
+
+async function api_call(url) {
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            return response.json();
+        } else {
+            console.error('Error:', response.status, response.statusText);
+            return null; 
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return null; 
+    }
+}
+
+async function getMyCards() {
+    var table = document.getElementById('mainTable');
+    while (table.childNodes.length > 2) {
+        table.childNodes[table.childNodes.length-1].remove();
+    }
+
+    var data = await api_call(getMyCardsUrl);
+
+    for (var x = 0; x < data.length; x++) {
+        var trElement = document.createElement('tr');
+        for (const [key, value] of Object.entries(data[x])) {
+            var tdElement = document.createElement('td');
+            tdElement.innerText = value;
+            trElement.appendChild(tdElement); 
+        }
+        table.appendChild(trElement);
+    }
+}
+
+</script>
+
+<div class="tableWrapper">
+    <table id="mainTable">
+        <tr>
+            <th>CardID</th>
+            <th>Expiry</th>
+            <th>Balance</th>
+            <th>CardType</th>
+        </tr>
+    </table>
+</div>
+
+<script>
+    function isAlphaNumeric(inputString) {
+        return /[a-zA-Z]/.test(inputString);
+    };
+
+    function resetNewCard() {
+        document.getElementById('NewBalance').value = "";
+        document.getElementById('NewExpiry').value = "";
+
+        var NewCardTypes = document.getElementById('NewCardTypes')
+        while (NewCardTypes.childNodes.length > 0) {
+            NewCardTypes.childNodes[0].remove();
+        }
+    }
+
+    async function openCardEditor() {
+        resetNewCard();
+        var cardTypeData = await api_call(getAllCardIdTypes);
+
+        var selectElement = document.getElementById("NewCardTypes");
+        for (var i = 0; i < cardTypeData.length; i++) {
+            var newOption = document.createElement("option");
+            newOption.value = cardTypeData[i]['cardtypeid']; 
+            newOption.text = cardTypeData[i]['typename']; 
+            selectElement.appendChild(newOption);
+        }
+        var emptySelection = document.createElement('option');
+        emptySelection.value = 'empty';
+        emptySelection.text = "";
+        emptySelection.selected = true;
+        emptySelection.hidden = true;
+        selectElement.appendChild(emptySelection);
+
+        document.getElementById('AddNewCard').style.display = 'flex';
+    }
+
+    async function addNewCard() {
+        var cardTypeValue = document.getElementById("NewCardTypes").value;
+        var expiryValue = document.getElementById("NewExpiry").value;
+        var balanceValue = document.getElementById("NewBalance").value;
+
+        var validData = true;
+        var error = ''
+
+        if (cardTypeValue == "empty") {
+            error += "\n You must select a card type.";
+            validData = false;
+        }
+        if (expiryValue == "") {
+            error += "\n You must provide an expiry date";
+            validData = false; 
+        }
+        if (isAlphaNumeric(balanceValue) == true) {
+            error += "\n You cann't enter in a alpha or alphanumeric balence"; 
+            validData = false;
+        }
+        if (balanceValue == "") {
+            balanceValue = 0; 
+        }
+
+        if (validData) {
+            var addNewCardToDBWithData = addNewCardToDB+`?CardType=${cardTypeValue}&Expiry=${expiryValue}&Balance=${balanceValue}`;
+            test = await api_call(addNewCardToDBWithData);
+            location.reload();
+        } else {
+            alert(error);
+        }
+ 
+    }
+</script>
+
+<div id="AddNewCardWrapper">
+    <div id="AddNewCard">
+        <div id="ProtectContents">
+            <h3>Create new card</h3>
+            <lavel for="'CardType">Assign card type: </lavel>
+            <select name="CardType" id="NewCardTypes">
+            </select>
+
+            <label for="datePicker">Select a Date:</label>
+            <input type="date" id="NewExpiry" name="selectedDate">
+
+            <label for="Balance">Balance: </label>
+            <input type="text" id="NewBalance" name="Balance" />
+
+            <button onclick="addNewCard()">Submit</button>
+        </div>
+    </div>
+</div>
+
+<div id="OpenCardReaderBTN">
+    <button onclick="openCardEditor()">New Card</button>
+</div>
+
+
+<script>
+    getMyCards();
+</script>
