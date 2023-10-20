@@ -638,7 +638,6 @@ def update_card(cardID,cardType,assignedUser,cardExpiry,cardBalence):
     cardBalence = sanitize_input(cardBalence)
 
     sql = f"UPDATE opaltravel.opalcards SET cardtypeid='{cardType}', userid='{assignedUser}', expiry='{cardExpiry}', balance='{cardBalence}' WHERE cardid='{cardID}'"
-    print(sql)
 
     preChange = get_card_byID(cardID)
     exercuteNonResponse(sql)

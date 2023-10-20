@@ -412,7 +412,7 @@ def get_all_users():
 
 @app.route('/cards/getAllCardTypes',methods=['GET'])
 def get_all_cardtypes():
-    if (session['isadmin'] == True):
+    if not (page['username'] == ""):
         cardTypes = database.get_all_card_types()
         return cardTypes
 
@@ -431,7 +431,7 @@ def update_card():
 
 @app.route('/cards/addNewCard',methods=['GET'])
 def add_new_card():
-    if (session['isadmin'] == True):
+    if not (page['username'] == ""):
         cardType = request.args.get('CardType', default = 1, type = str)
         assignedUser = request.args.get('Users', default = 1, type = int)
         cardExpiry = request.args.get('Expiry', default = 1, type = str)
